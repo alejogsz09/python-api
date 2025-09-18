@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, abort
+from flask import Flask, jsonify, abort, request
 
 days = [
     {"id": 1, "name": "Monday"},
@@ -28,8 +28,23 @@ def get_day(day_id):
 
 @app.route("/", methods=["POST"])
 def post_days():
-    return jsonify({"success": True}), 201
+    if not request.json or 'name' not in request.json:
+        abort(400)  # Bad Request si no envía 'name'
+
+    new_day = {
+        "id": len(days) + 1,
+        "name": request.json["name"]
+    }
+
+    days.append(new_day)
+    return jsonify(new_day), 201
+
+
+@app.route("/api/hello", methods=["GET"])
+def hello():
+    return jsonify({"message": "Hola desde el método GET"})
 
 
 if __name__ == "__main__":
     app.run(debug=True)
+
